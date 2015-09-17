@@ -278,23 +278,26 @@ EkkoLightbox.prototype = {
 
 	preloadImage : ( src, onLoadShowImage) ->
 
-		img = new Image()
-		if !onLoadShowImage? || onLoadShowImage == true
+		img = new Image
+		if !onLoadShowImage? or onLoadShowImage == true
+
 			img.onload = =>
+				maxh = $(window).height() * 0.8 # % of screen height
 				image = $('<img />')
-				image.attr('src', img.src)
-				image.addClass('img-responsive')
+				image.attr 'src', img.src
+				image.attr 'style', 'max-height: ' + maxh + 'px'
+				image.addClass 'img-responsive'
 				@lightbox_body.html image
 				@modal_arrows.css 'display', 'block' if @modal_arrows
 				image.load =>
-					@resize img.width
-					@options.onContentLoaded.call(@)
+					@resize Math.min(maxh / img.height, 1) * img.width
+					@options.onContentLoaded.call _this
 			img.onerror = =>
 				@error 'Failed to load image: ' + src
-
+				
 		img.src = src
 		img
-
+  
 	resize : ( width ) ->
 		#resize the dialog based on the width given, and adjust the directional arrow padding
 		width_total = width + @border.left + @padding.left + @padding.right + @border.right
